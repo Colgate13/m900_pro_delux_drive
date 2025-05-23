@@ -1,6 +1,7 @@
 use std::fs::{self, File};
 use std::io::{Read, BufReader, BufRead};
 use std::path::Path;
+use std::process::Command;
 
 fn main() {
     let target_hid_id = "0003:00001D57:0000FA65";
@@ -28,6 +29,16 @@ fn main() {
                     buffer[1], buffer[2], buffer[3], battery,
                     battery
                 );
+
+                if battery <= 5 {
+                 Command::new("notify-send")
+                    .arg("-i")
+                    .arg("battery")
+                    .arg("Mouse battery low")
+                    .arg(format!("level: {}%", battery))
+                    .spawn()
+                    .expect("Error to emitted notification");
+                }
             }
             Ok(_) => {}
             Err(e) => {
@@ -36,7 +47,7 @@ fn main() {
             }
         }
 
-        std::thread::sleep(std::time::Duration::from_secs(30));
+        std::thread::sleep(std::time::Duration::from_secs(10));
     }
 }
 
