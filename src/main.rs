@@ -8,14 +8,12 @@ fn main() {
     let device_path = match find_hidraw_by_hid_id(target_hid_id) {
         Some(path) => path,
         None => {
-            eprintln!("Dispositivo com HID_ID {} não encontrado.", target_hid_id);
+            eprintln!("Device {} not found.", target_hid_id);
             return;
         }
     };
 
-    println!("Dispositivo encontrado: {}", device_path);
-
-    let mut file = File::open(&device_path).expect("Erro ao abrir HID");
+    let mut file = File::open(&device_path).expect("Error to open HID");
 
     loop {
         let mut buffer = [0u8; 5]; // Revicer 5 bytes
@@ -25,17 +23,15 @@ fn main() {
                 let battery = buffer[4]; // battery
 
                 println!(
-                    "Report ID: {:#04X}, Dados: {:02X} {:02X} {:02X} {:02X} => ⚡ Bateria: {}%",
+                    "Report ID: {:#04X}, Data: {:02X} {:02X} {:02X} {:02X} => ⚡ Battery: {}%",
                     report_id,
                     buffer[1], buffer[2], buffer[3], battery,
                     battery
                 );
             }
-            Ok(n) => {
-                println!("Leitura parcial: {} bytes", n);
-            }
+            Ok(_) => {}
             Err(e) => {
-                eprintln!("Erro ao ler: {}", e);
+                eprintln!("Error to read: {}", e);
                 break;
             }
         }
